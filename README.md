@@ -1,3 +1,3 @@
 #UGRL
-The Pytorch implemrntation of UGRL
+The Pytorch implementation of UGRL
 
