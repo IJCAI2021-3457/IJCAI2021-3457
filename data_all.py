@@ -1,44 +1,25 @@
-import inspect
-import random
-
 import torch
+import os
 import torch_geometric as pyg
 from copy import deepcopy
-
-from sklearn.decomposition import PCA
 from termcolor import cprint
 from torch_geometric.datasets import *
-from torch_geometric.data import DataLoader, InMemoryDataset, Data, NeighborSampler
-from torch_geometric.transforms import Compose
-from torch_geometric.utils import is_undirected, to_undirected, degree, sort_edge_index, remove_self_loops, \
-    add_self_loops, negative_sampling, train_test_split_edges
+from torch_geometric.data import DataLoader, InMemoryDataset, NeighborSampler
+from torch_geometric.utils import is_undirected, to_undirected, sort_edge_index, remove_self_loops, \
+     add_self_loops, negative_sampling, train_test_split_edges
 from torch_geometric.io import read_npz
 import numpy as np
-
-import os
-from pprint import pprint
 from typing import Tuple, Callable, List
-
 from tqdm import tqdm
-
-import ogb
 from ogb.nodeproppred import PygNodePropPredDataset
-
-from data_unit.data_saint import MyGraphSAINTRandomWalkSampler, DisjointGraphSAINTRandomWalkSampler
 from data_unit.data_sampler import MyNeighborSampler
 from data_unit.data_syn import RandomPartitionGraph
 from data_unit.data_transform import DigitizeY, ToUndirected
 from data_unit.data_utils import mask_init, mask_getitem, collate_and_pca, get_loader_and_dataset_kwargs
-from data_unit.data_webkb4univ import WebKB4Univ
-from data_unit.data_bg import GNNBenchmarkDataset
-from data_unit.data_flickr import Flickr
-from data_unit.data_wikics import WikiCS
-from data_unit.data_snap import SNAPDataset, Crocodile, Squirrel, Chameleon
 from data_unit.data_reddit import MyReddit
 from data_unit.utils import negative_sampling_numpy
-
 from multiprocessing import Process, Queue
-import os
+
 
 
 class ENSPlanetoid(Planetoid):
@@ -864,21 +845,6 @@ if __name__ == '__main__':
     _test_data("FullPlanetoid", "CiteSeer", '~/graph-data')
     _test_data("FullPlanetoid", "PubMed", '~/graph-data')
     exit()
-    # _test_data("PygNodePropPredDataset", "ogbn-arxiv", '~/graph-data')
-    # exit()
-
-    # _test_data("MyReddit", "MyReddit", '~/graph-data', batch_size=4096,
-    #            sampler="GraphSAINTRandomWalkSampler",
-    #            size=[5, 5], num_hops=2, neg_sample_ratio=0.5, num_version=2)
-    # exit()
-    # _test_data("Reddit", "Reddit", '~/graph-data', batch_size=512,
-    #            sampler="MyNeighborSampler", size=[15, 10], num_hops=2, neg_sample_ratio=0.5)
-    # exit()
-    # _test_data("PygNodePropPredDataset", "ogbn-products", '~/graph-data',
-    #            size=[10, 5], num_hops=2)
-    # _test_data("PygNodePropPredDataset", "ogbn-arxiv", '~/graph-data')
-    # exit()
-
     _test_data("MyCitationFull", "CoraFull", '~/graph-data')
     _test_data("MyCoauthor", "CS", '~/graph-data')
     _test_data("Chameleon", "Chameleon", '~/graph-data')

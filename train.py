@@ -1,32 +1,19 @@
-import os
 import random
 import time
 import torch
 from copy import deepcopy
 import torch.nn.functional as F
-from torch.optim.lr_scheduler import MultiStepLR
-from collections import deque, defaultdict
 import torch.nn as nn
-import torch.optim as optim
-#from arguments_photo import get_important_args, save_args, get_args, pprint_args, get_args_key
 from colorama import init, Fore, Back, Style
 import shutil
-import scipy.sparse as sp
 import numpy as np
-import pandas as pd
-from termcolor import cprint
 from tqdm import tqdm
-from sklearn.metrics import f1_score
 from data_all import getattr_d, get_dataset_or_loader
-from data_unit.utils import create_hash, to_one_hot, get_accuracy, cprint_multi_lines, blind_other_gpus
+from data_unit.utils import blind_other_gpus
 from models import  LogReg, UGRL_GCN_test
-import argparse
 from tensorboardX import SummaryWriter
-from munkres import Munkres, print_matrix
-from sklearn.cluster import KMeans
+from munkres import Munkres
 from sklearn import metrics
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
 import os
 import argparse
 from ruamel.yaml import YAML
@@ -530,7 +517,6 @@ def run_GCN(args, gpu_id=None, exp_name= None,number = 0 , return_model=False, r
                     ac.append(acc_small*100)
                 accs_small = ac
             accs = torch.stack(accs)
-            # accs_small = torch.stack(accs_small)
             string_3 = ""
             for i in range(nb_classes):
                 string_3 = string_3 + "|{:.1f}".format(accs_small[i].item())
@@ -538,7 +524,6 @@ def run_GCN(args, gpu_id=None, exp_name= None,number = 0 , return_model=False, r
             tqdm.write(string_1 + string_2 + string_3)
             logfile.write(string_1 + string_2 + string_3+ "\n")
             writer.add_scalar('NodeClass/ACC', accs.mean().item(), epoch)
-            # writer.add_scalar('Graph/ACC', graph_acc*100, epoch)
             final_acc = accs.mean().item()
             best_acc = max(best_acc, final_acc)
     logfile.close()
@@ -565,9 +550,9 @@ if __name__ == '__main__':
     num_total_runs = 10
     main_args = get_args(
         model_name="GAT",  # GAT, GCN
-        dataset_class="Planetoid",  # Planetoid, WikiCS,MyCitationFull, MyAmazon,Crocodile, MyCitationFull,   FullPlanetoid, RandomPartitionGraph
-        dataset_name="Cora",  # Cora, CiteSeer, PubMed, WikiCS,DBLP,Photo,Crocodile,CoraFull,   rpg-10-500-0.1-0.025
-        custom_key="EV13NSO8",  # EV13NSO8,EV13NSO8,NE-500,NE,E,E,E, EV13,     NEO8, NEDPO8, EV13NSO8, EV9NSO8, EV1O8, EV2O8, -500, -Link, -ES, -ATT
+        dataset_class="Planetoid",  # Planetoid, WikiCS,MyCitationFull, MyAmazon,Crocodile, MyCitationFull
+        dataset_name="Cora",  # Cora, CiteSeer, PubMed, WikiCS,DBLP,Photo,Crocodile,CoraFull,
+        custom_key="EV13NSO8",  # EV13NSO8,EV13NSO8,NE-500,NE,E,E,E, EV13
     )
     pprint_args(main_args)
     filePath = "log"

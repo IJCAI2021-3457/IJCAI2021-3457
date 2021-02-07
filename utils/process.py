@@ -118,8 +118,6 @@ def load_data(dataset_str): # {'pubmed', 'citeseer', 'cora'}
     test_idx_range = np.sort(test_idx_reorder)
 
     if dataset_str == 'citeseer'  :
-        # Fix citeseer dataset (there are some isolated nodes in the graph)
-        # Find isolated nodes, add them as zero-vecs into the right position
         test_idx_range_full = range(min(test_idx_reorder), max(test_idx_reorder)+1)
         tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
         tx_extended[test_idx_range-min(test_idx_range), :] = tx
@@ -210,10 +208,6 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
 
-# Perform train-test split
-    # Takes in adjacency matrix in sparse format
-    # Returns: adj_train, train_edges, val_edges, val_edges_false, 
-        # test_edges, test_edges_false
 def mask_test_edges(adj, test_frac=.1, val_frac=.05, prevent_disconnect=True, verbose=False):
     # NOTE: Splits are randomized and results might slightly deviate from reported numbers in the paper.
     "from https://github.com/tkipf/gae"
@@ -233,7 +227,6 @@ def mask_test_edges(adj, test_frac=.1, val_frac=.05, prevent_disconnect=True, ve
     adj_triu = sp.triu(adj) # upper triangular portion of adj matrix
     adj_tuple = sparse_to_tuple(adj_triu) # (coords, values, shape), edges only 1 way
     edges = adj_tuple[0] # all edges, listed only once (not 2 ways)
-    # edges_all = sparse_to_tuple(adj)[0] # ALL edges (includes both ways)
     num_test = int(np.floor(edges.shape[0] * test_frac)) # controls how large the test set should be
     num_val = int(np.floor(edges.shape[0] * val_frac)) # controls how alrge the validation set should be
 
