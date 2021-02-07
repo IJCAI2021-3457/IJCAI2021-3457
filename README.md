@@ -1,4 +1,4 @@
-#UGRL
+## UGRL
 Official implementation of Robust Unsupervised Graph Representation Learning.
 
 ## Basics
