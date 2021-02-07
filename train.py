@@ -22,11 +22,8 @@ def get_args_key(args):
     return "-".join([args.model_name, args.dataset_name, args.custom_key])
 
 def get_args(model_name, dataset_class, dataset_name, custom_key="", yaml_path=None) -> argparse.Namespace:
-
     yaml_path = yaml_path or os.path.join(os.path.dirname(os.path.realpath(__file__)), "args.yaml")
-
     custom_key = custom_key.split("+")[0]
-
     parser = argparse.ArgumentParser(description='Parser for Supervised Graph Attention Networks')
 
     # Basics
