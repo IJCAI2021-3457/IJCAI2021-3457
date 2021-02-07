@@ -43,7 +43,7 @@ python3 IJCAI2021-3457/train.py \
     --black-list 1 2 3
 ```
 
-### Dataset (`--dataset-class`, `--dataset-name`)
+### Dataset (`--dataset-class`, `--dataset-name`,`--Custom-key`)
 
 | Dataset class   | Dataset name                  |Custom key    |
 |-----------------|-------------------------------|--------------|
