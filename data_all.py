@@ -21,7 +21,6 @@ from data_unit.utils import negative_sampling_numpy
 from multiprocessing import Process, Queue
 
 
-
 class ENSPlanetoid(Planetoid):
     """Efficient Negative Sampling for Planetoid"""
 
