@@ -1,4 +1,4 @@
-#UGRL
+## UGRL
 Official implementation of Robust Unsupervised Graph Representation Learning.
 
 ## Basics
@@ -43,16 +43,15 @@ python3 IJCAI2021-3457/train.py \
     --black-list 1 2 3
 ```
 
-### Dataset (`--dataset-class`, `--dataset-name`)
+### Dataset (`--dataset-class`, `--dataset-name`,`--Custom-key`)
 
 | Dataset class   | Dataset name                  |Custom key    |
 |-----------------|-------------------------------|--------------|
 | Planetoid       | Cora                          |EV13NSO8      |
 | Planetoid       | CiteSeer                      |EV13NSO8      |
-| Planetoid       | PubMed                        |EV13NSO8      |
-| WikiCS          | WikiCS                        |NE-500        |
-| MyAmazon        | Photo                         |NE            |
-| MyAmazon        | Computers                     |E             |
+| Planetoid       | PubMed                        |NE-500        |
+| WikiCS          | WikiCS                        |NE            |
+| MyAmazon        | Photo                         |E             |
 | MyCitationFull  | CoraFull                      |E             |
 | MyCitationFull  | DBLP                          |E             |
 | Crocodile       | Crocodile                     |EV13          |

@@ -5,13 +5,11 @@ from copy import deepcopy
 import torch.nn.functional as F
 import torch.nn as nn
 from colorama import init, Fore, Back, Style
-import shutil
 import numpy as np
 from tqdm import tqdm
 from data_all import getattr_d, get_dataset_or_loader
 from data_unit.utils import blind_other_gpus
 from models import  LogReg, UGRL_GCN_test
-from tensorboardX import SummaryWriter
 from munkres import Munkres
 from sklearn import metrics
 import os
@@ -22,13 +20,9 @@ def get_args_key(args):
     return "-".join([args.model_name, args.dataset_name, args.custom_key])
 
 def get_args(model_name, dataset_class, dataset_name, custom_key="", yaml_path=None) -> argparse.Namespace:
-
     yaml_path = yaml_path or os.path.join(os.path.dirname(os.path.realpath(__file__)), "args.yaml")
-
     custom_key = custom_key.split("+")[0]
-
     parser = argparse.ArgumentParser(description='Parser for Supervised Graph Attention Networks')
-
     # Basics
     parser.add_argument("--m", default="", type=str, help="Memo")
     parser.add_argument("--num-gpus-total", default=0, type=int)
@@ -167,22 +161,17 @@ def get_important_args(_args: argparse.Namespace) -> dict:
             ret[ia_key] = _args.__getattribute__(ia_key)
     return ret
 
-
 def save_args(model_dir_path: str, _args: argparse.Namespace):
-
     if not os.path.isdir(model_dir_path):
         raise NotADirectoryError("Cannot save arguments, there's no {}".format(model_dir_path))
-
     with open(os.path.join(model_dir_path, "args.txt"), "w") as arg_file:
         for k, v in sorted(_args.__dict__.items()):
             arg_file.write("{}: {}\n".format(k, v))
-
 
 def pprint_args(_args: argparse.Namespace):
     cprint("Args PPRINT: {}".format(get_args_key(_args)), "yellow")
     for k, v in sorted(_args.__dict__.items()):
         print("\t- {}: {}".format(k, v))
-
 
 def pdebug_args(_args: argparse.Namespace, logger):
     logger.debug("Args LOGGING-PDEBUG: {}".format(get_args_key(_args)))
@@ -307,8 +296,6 @@ def get_dataset(args, dataset_kwargs):
     A = A_sp.to_dense()
     I = torch.eye(A.shape[1]).to(A.device)
     A_I = A + I
-    A_nomal = normalize_graph(A)
-    A_sp_nomal = A_nomal.to_sparse()
     A_I_nomal = normalize_graph(A_I)
     return train_d, [A_I, A_I_nomal, A_sp], [train_d.data.x]
 
@@ -317,10 +304,6 @@ def run_GCN(args, gpu_id=None, exp_name= None,number = 0 , return_model=False, r
     random.seed(args.seed)
     torch.cuda.manual_seed(args.seed)
     np.random.seed(args.seed)
-    writename = "-"+exp_name[4:] + "_" + str(number)
-    logname = os.path.join(exp_name, str(number)+"_"+str(args.seed) +".txt")
-    logfile = open(logname,'a')
-    writer = SummaryWriter(comment=writename)
     final_acc  = 0
     best_acc = 0
     torch.backends.cudnn.deterministic = True
@@ -492,9 +475,6 @@ def run_GCN(args, gpu_id=None, exp_name= None,number = 0 , return_model=False, r
 
             accs = []
             accs_small = []
-            # wd = 0.0
-            # if args.dataset_name in ['Cora', 'CiteSeer','PubMed']:
-            #   wd = 0.01
             xent = nn.CrossEntropyLoss()
             for _ in range(2):
                 log = LogReg(args.dim, nb_classes)
@@ -522,16 +502,11 @@ def run_GCN(args, gpu_id=None, exp_name= None,number = 0 , return_model=False, r
                 string_3 = string_3 + "|{:.1f}".format(accs_small[i].item())
             string_2 = Fore.GREEN +" epoch: {},accs: {:.1f},std: {:.2f} ".format(epoch, accs.mean().item(),accs.std().item() )
             tqdm.write(string_1 + string_2 + string_3)
-            logfile.write(string_1 + string_2 + string_3+ "\n")
-            writer.add_scalar('NodeClass/ACC', accs.mean().item(), epoch)
             final_acc = accs.mean().item()
             best_acc = max(best_acc, final_acc)
-    logfile.close()
-    newname = logname[:-4]+"_"+str("%.1f"%final_acc)+"_"+str("%.1f"%best_acc)+".txt"
-    os.rename(logname, newname)
     return final_acc, best_acc
 
-def run_with_many_seeds(args, num_seeds, exp_name, gpu_id=None, **kwargs):
+def run_with_many_seeds(args, num_seeds, gpu_id=None, **kwargs):
     results_acc = []
     results_best = []
     results_epoch = []
@@ -539,7 +514,7 @@ def run_with_many_seeds(args, num_seeds, exp_name, gpu_id=None, **kwargs):
         cprint("## TRIAL {} ##".format(i), "yellow")
         _args = deepcopy(args)
         _args.seed = _args.seed + random.randint(0,100)
-        acc,best = run_GCN(_args, gpu_id=gpu_id, exp_name= exp_name,number = i , **kwargs)
+        acc,best = run_GCN(_args, gpu_id=gpu_id, number = i , **kwargs)
         results_acc.append(torch.as_tensor(acc,dtype=torch.float32))
         results_best.append(torch.as_tensor(best,dtype=torch.float32))
     results_acc = torch.stack(results_acc)
@@ -550,22 +525,23 @@ if __name__ == '__main__':
     num_total_runs = 10
     main_args = get_args(
         model_name="GAT",  # GAT, GCN
-        dataset_class="Planetoid",  # Planetoid, WikiCS,MyCitationFull, MyAmazon,Crocodile, MyCitationFull
-        dataset_name="Cora",  # Cora, CiteSeer, PubMed, WikiCS,DBLP,Photo,Crocodile,CoraFull,
-        custom_key="EV13NSO8",  # EV13NSO8,EV13NSO8,NE-500,NE,E,E,E, EV13
+        dataset_class="Planetoid",  # Planetoid, WikiCS, MyCitationFull, MyAmazon, Crocodile, MyCitationFull
+        dataset_name="Cora",  # Cora, CiteSeer, PubMed, WikiCS, DBLP, Photo, Crocodile, CoraFull,
+        custom_key="EV13NSO8",  # EV13NSO8, EV13NSO8, NE-500, NE , E, E, E, EV13
     )
-    pprint_args(main_args)
-    filePath = "log"
-    exp_ID = 0
-    for filename in os.listdir(filePath):
-        file_info = filename.split("_")
-        file_dataname = file_info[0]
-        if file_dataname == main_args.dataset_name:
-            exp_ID = max(int(file_info[1]),exp_ID)
-    exp_name = main_args.dataset_name + "_" + str(exp_ID+1)
-    exp_name = os.path.join(filePath,exp_name)
-    os.makedirs(exp_name)
+    ### Dataset (`--dataset-class`, `--dataset-name`,`--Custom-key`)
+    # | Dataset
+    # |class           | Dataset name | Custom key |
+    # | Planetoid      | Cora         | EV13NSO8   |
+    # | Planetoid      | CiteSeer     | EV13NSO8   |
+    # | Planetoid      | PubMed       | NE - 500   |
+    # | WikiCS         | WikiCS       | NE         |
+    # | MyAmazon       | Photo        | E          |
+    # | MyCitationFull | CoraFull     | E          |
+    # | MyCitationFull | DBLP         | E          |
+    # | Crocodile      | Crocodile    | EV13       |
 
+    pprint_args(main_args)
     if len(main_args.black_list) == main_args.num_gpus_total:
         alloc_gpu = [None]
         cprint("Use CPU", "yellow")
@@ -581,12 +557,5 @@ if __name__ == '__main__':
     # noinspection PyTypeChecker
     t0 = time.perf_counter()
     main_args.ir = 0.01
-    arg_file = open(os.path.join(exp_name,"arg.txt"),"a")
-    for k, v in sorted(main_args.__dict__.items()):
-        arg_file.write("\n- {}: {}".format(k, v))
-    arg_file.close()
-    shutil.copyfile('train.py',os.path.join(exp_name,'train.py'))
-    shutil.copyfile('models/UGRL.py', os.path.join(exp_name, 'UGRL.py'))
-    many_seeds_result = run_with_many_seeds(main_args, num_total_runs,exp_name, gpu_id=alloc_gpu[0])
-    os.rename(exp_name, exp_name+"_"+'%.2f'%many_seeds_result)
+    many_seeds_result = run_with_many_seeds(main_args, num_total_runs, gpu_id=alloc_gpu[0])
     cprint("Time for runs (s): {}".format(time.perf_counter() - t0))
