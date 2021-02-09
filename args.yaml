@@ -16,7 +16,7 @@ GAT: &GAT
 
 GAT-Cora: &GAT-Cora
   <<: *GAT
-  black_list: [0,1,2]
+  black_list: [0,3,2]
   lr: 0.005
   out_heads: 1
   task_type: Node_Transductive
