@@ -530,8 +530,7 @@ if __name__ == '__main__':
         custom_key="EV13NSO8",  # EV13NSO8, EV13NSO8, NE-500, NE , E, E, E, EV13
     )
     ### Dataset (`--dataset-class`, `--dataset-name`,`--Custom-key`)
-    # | Dataset
-    # |class           | Dataset name | Custom key |
+    # | Dataset class  | Dataset name | Custom key |
     # | Planetoid      | Cora         | EV13NSO8   |
     # | Planetoid      | CiteSeer     | EV13NSO8   |
     # | Planetoid      | PubMed       | NE-500     |
