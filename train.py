@@ -534,7 +534,7 @@ if __name__ == '__main__':
     # |class           | Dataset name | Custom key |
     # | Planetoid      | Cora         | EV13NSO8   |
     # | Planetoid      | CiteSeer     | EV13NSO8   |
-    # | Planetoid      | PubMed       | NE-500   |
+    # | Planetoid      | PubMed       | NE-500     |
     # | WikiCS         | WikiCS       | NE         |
     # | MyAmazon       | Photo        | E          |
     # | MyCitationFull | CoraFull     | E          |
