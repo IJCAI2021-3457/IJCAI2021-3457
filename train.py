@@ -526,7 +526,7 @@ if __name__ == '__main__':
     main_args = get_args(
         model_name="GAT",  # GAT, GCN
         dataset_class="Planetoid",  # Planetoid, WikiCS, MyCitationFull, MyAmazon, Crocodile, MyCitationFull
-        dataset_name="Cora",  # Cora, CiteSeer, PubMed, WikiCS, DBLP, Photo, Crocodile, CoraFull,
+        dataset_name="CiteSeer",  # Cora, CiteSeer, PubMed, WikiCS, DBLP, Photo, Crocodile, CoraFull,
         custom_key="EV13NSO8",  # EV13NSO8, EV13NSO8, NE-500, NE , E, E, E, EV13
     )
     ### Dataset (`--dataset-class`, `--dataset-name`,`--Custom-key`)
@@ -534,7 +534,7 @@ if __name__ == '__main__':
     # |class           | Dataset name | Custom key |
     # | Planetoid      | Cora         | EV13NSO8   |
     # | Planetoid      | CiteSeer     | EV13NSO8   |
-    # | Planetoid      | PubMed       | NE - 500   |
+    # | Planetoid      | PubMed       | NE-500   |
     # | WikiCS         | WikiCS       | NE         |
     # | MyAmazon       | Photo        | E          |
     # | MyCitationFull | CoraFull     | E          |
